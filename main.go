@@ -50,6 +50,21 @@ func main() {
 				url = url[1 : len(url)-1]
 				c.Redirect(http.StatusFound, url)
 			} else {
+				log.Println(err)
+				statusCode := http.StatusServiceUnavailable
+				message := http.StatusText(statusCode)
+				c.JSON(statusCode, gin.H{"message": message})
+			}
+		})
+
+		api.GET("/porn", func(c *gin.Context) {
+			subreddit, err := client.SRandMember(ctx, "porn").Result()
+			if err == nil {
+				subreddit = subreddit[1 : len(subreddit)-1]
+				url := "https://www.reddit.com/" + subreddit + "/"
+				c.Redirect(http.StatusFound, url)
+			} else {
+				log.Println(err)
 				statusCode := http.StatusServiceUnavailable
 				message := http.StatusText(statusCode)
 				c.JSON(statusCode, gin.H{"message": message})
