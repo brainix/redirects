@@ -30,3 +30,8 @@ upgrade:
 	brew cleanup
 	-heroku update
 	go get -u -v $(packages)
+
+
+.PHONY: run
+run:
+	heroku local:run go run main.go
