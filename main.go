@@ -35,23 +35,34 @@ func main() {
 	{
 		api.GET("/health", func(c *gin.Context) {
 			statusCode := http.StatusOK
-
 			_, err := client.Ping(ctx).Result()
 			if err != nil {
-				statusCode = http.StatusServiceUnavailable
 				log.Println(err)
+				statusCode = http.StatusServiceUnavailable
 			}
+			message := http.StatusText(statusCode)
+			c.JSON(statusCode, gin.H{"message": message})
+		})
 
-			c.JSON(statusCode, gin.H{
-				"message": http.StatusText(statusCode),
-			})
+		api.GET("/gtfo", func(c *gin.Context) {
+			url, err := client.SRandMember(ctx, "gtfo").Result()
+			if err == nil {
+				url = url[1 : len(url)-1]
+				c.Redirect(http.StatusFound, url)
+			} else {
+				statusCode := http.StatusServiceUnavailable
+				message := http.StatusText(statusCode)
+				c.JSON(statusCode, gin.H{"message": message})
+			}
 		})
 	}
 
 	router.NoRoute(func(c *gin.Context) {
+		statusCode := http.StatusNotFound
+		name := http.StatusText(statusCode)
 		c.JSON(http.StatusNotFound, gin.H{
-			"status_code": http.StatusNotFound,
-			"name":        http.StatusText(http.StatusNotFound),
+			"status_code": statusCode,
+			"name":        name,
 		})
 	})
 
