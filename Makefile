@@ -32,6 +32,10 @@ upgrade:
 	go get -u -v $(packages)
 
 
+.PHONY: format
+format:
+	gofmt -s -w .
+
 .PHONY: run
-run:
+run: format
 	heroku local:run go run main.go

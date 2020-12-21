@@ -29,6 +29,13 @@ func main() {
 		})
 	}
 
+	router.NoRoute(func(c *gin.Context) {
+		c.JSON(http.StatusNotFound, gin.H{
+			"status_code": http.StatusNotFound,
+			"name":        http.StatusText(http.StatusNotFound),
+		})
+	})
+
 	port := os.Getenv("PORT")
 	if port == "" {
 		log.Fatal("$PORT must be set")
