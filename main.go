@@ -8,82 +8,31 @@
 package main
 
 import (
-	"context"
 	"log"
-	"net/http"
 	"os"
 
-	"github.com/gin-gonic/gin"
 	"github.com/go-redis/redis"
 )
 
-func main() {
-	redisURL := os.Getenv("REDIS_URL")
-	if redisURL == "" {
-		log.Fatal("$REDIS_URL must be set")
+var client *redis.Client
+
+func getEnvVar(key string) string {
+	value := os.Getenv(key)
+	if value == "" {
+		log.Fatal("$" + key + " must be set")
 	}
+	return value
+}
+
+func main() {
+	redisURL := getEnvVar("REDIS_URL")
 	opts, err := redis.ParseURL(redisURL)
 	if err != nil {
 		log.Fatal(err)
 	}
-	client := redis.NewClient(opts)
-	ctx := context.Background()
+	client = redis.NewClient(opts)
+	router := initRouter()
 
-	router := gin.Default()
-
-	api := router.Group("/v1")
-	{
-		api.GET("/health", func(c *gin.Context) {
-			statusCode := http.StatusOK
-			_, err := client.Ping(ctx).Result()
-			if err != nil {
-				log.Println(err)
-				statusCode = http.StatusServiceUnavailable
-			}
-			message := http.StatusText(statusCode)
-			c.JSON(statusCode, gin.H{"message": message})
-		})
-
-		api.GET("/gtfo", func(c *gin.Context) {
-			url, err := client.SRandMember(ctx, "gtfo").Result()
-			if err == nil {
-				url = url[1 : len(url)-1]
-				c.Redirect(http.StatusFound, url)
-			} else {
-				log.Println(err)
-				statusCode := http.StatusServiceUnavailable
-				message := http.StatusText(statusCode)
-				c.JSON(statusCode, gin.H{"message": message})
-			}
-		})
-
-		api.GET("/porn", func(c *gin.Context) {
-			subreddit, err := client.SRandMember(ctx, "porn").Result()
-			if err == nil {
-				subreddit = subreddit[1 : len(subreddit)-1]
-				url := "https://www.reddit.com/" + subreddit + "/"
-				c.Redirect(http.StatusFound, url)
-			} else {
-				log.Println(err)
-				statusCode := http.StatusServiceUnavailable
-				message := http.StatusText(statusCode)
-				c.JSON(statusCode, gin.H{"message": message})
-			}
-		})
-	}
-
-	router.NoRoute(func(c *gin.Context) {
-		statusCode := http.StatusNotFound
-		name := http.StatusText(statusCode)
-		c.JSON(http.StatusNotFound, gin.H{
-			"status_code": statusCode,
-			"name":        name,
-		})
-	})
-
-	port := os.Getenv("PORT")
-	if port == "" {
-		log.Fatal("$PORT must be set")
-	}
+	port := getEnvVar("PORT")
 	router.Run(":" + port)
 }

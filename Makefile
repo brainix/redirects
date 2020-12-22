@@ -38,4 +38,5 @@ format:
 
 .PHONY: run
 run: format
-	heroku local:run go run main.go
+	go build -o app
+	heroku local:run ./app
