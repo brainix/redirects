@@ -8,7 +8,6 @@
 package main
 
 import (
-	"context"
 	"log"
 	"net/http"
 
@@ -17,8 +16,7 @@ import (
 
 func health(c *gin.Context) {
 	statusCode := http.StatusOK
-	ctx := context.Background()
-	_, err := client.Ping(ctx).Result()
+	_, err := client.Ping().Result()
 	if err != nil {
 		log.Println(err)
 		statusCode = http.StatusServiceUnavailable

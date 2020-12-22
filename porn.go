@@ -8,7 +8,6 @@
 package main
 
 import (
-	"context"
 	"log"
 	"net/http"
 
@@ -16,8 +15,7 @@ import (
 )
 
 func porn(c *gin.Context) {
-	ctx := context.Background()
-	subreddit, err := client.SRandMember(ctx, "porn").Result()
+	subreddit, err := client.SRandMember("porn").Result()
 	if err == nil {
 		subreddit = subreddit[1 : len(subreddit)-1]
 		url := "https://www.reddit.com/" + subreddit + "/"

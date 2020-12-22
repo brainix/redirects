@@ -8,7 +8,6 @@
 package main
 
 import (
-	"context"
 	"log"
 	"net/http"
 
@@ -16,8 +15,7 @@ import (
 )
 
 func gtfo(c *gin.Context) {
-	ctx := context.Background()
-	url, err := client.SRandMember(ctx, "gtfo").Result()
+	url, err := client.SRandMember("gtfo").Result()
 	if err == nil {
 		url = url[1 : len(url)-1]
 		c.Redirect(http.StatusFound, url)
