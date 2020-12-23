@@ -11,6 +11,7 @@ import (
 	"log"
 	"os"
 
+	"github.com/gin-gonic/gin"
 	"github.com/go-redis/redis"
 )
 
@@ -22,6 +23,18 @@ func getEnvVar(key string) string {
 		log.Fatal("$" + key + " must be set")
 	}
 	return value
+}
+
+func initRouter() *gin.Engine {
+	router := gin.Default()
+	api := router.Group("/v1")
+	{
+		api.GET("/health", health)
+		api.GET("/gtfo", gtfo)
+		api.GET("/porn", porn)
+	}
+	router.NoRoute(notFound)
+	return router
 }
 
 func main() {

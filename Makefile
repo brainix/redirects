@@ -25,11 +25,15 @@ init:
 
 .PHONY: upgrade
 upgrade:
+	@# export GOPATH="$HOME/Documents/Code/go
+	@# export PATH="$PATH:$GOPATH/bin"
 	-brew update
 	-brew upgrade $(formulae)
 	brew cleanup
 	-heroku update
-	go get -u -v $(packages)
+	@# -go mod init
+	@# go get -u -v $(packages)
+	@# go mod tidy
 
 
 .PHONY: format
