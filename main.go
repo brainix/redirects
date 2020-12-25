@@ -27,6 +27,7 @@ func getEnvVar(key string) string {
 
 func initRouter() *gin.Engine {
 	router := gin.Default()
+	router.StaticFile("/loaderio-caa44a0090b3e2f28909941b0c7b7e9f.txt", "./static/loaderio-caa44a0090b3e2f28909941b0c7b7e9f.txt")
 	api := router.Group("/v1")
 	{
 		api.GET("/health", health)
