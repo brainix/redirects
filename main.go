@@ -31,8 +31,11 @@ func initRouter() *gin.Engine {
 	api := router.Group("/v1")
 	{
 		api.GET("/health", health)
+		api.HEAD("/health", health)
 		api.GET("/gtfo", gtfo)
+		api.HEAD("/gtfo", gtfo)
 		api.GET("/porn", porn)
+		api.HEAD("/porn", porn)
 	}
 	router.NoRoute(notFound)
 	return router
