@@ -1,5 +1,5 @@
 /*---------------------------------------------------------------------------*\
- |  endpoints.go                                                             |
+ |  handlers.go                                                              |
  |                                                                           |
  |  Copyright © 2016-2020, Rajiv Bakulesh Shah, original author.             |
  |  All rights reserved.                                                     |
@@ -14,7 +14,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func health(c *gin.Context) {
+func handleHealth(c *gin.Context) {
 	statusCode := http.StatusOK
 	_, err := client.Ping().Result()
 	if err != nil {
@@ -25,7 +25,7 @@ func health(c *gin.Context) {
 	c.JSON(statusCode, gin.H{"message": message})
 }
 
-func gtfo(c *gin.Context) {
+func handleGTFO(c *gin.Context) {
 	url, err := client.SRandMember("gtfo").Result()
 	if err == nil {
 		url = url[1 : len(url)-1]
@@ -38,7 +38,7 @@ func gtfo(c *gin.Context) {
 	}
 }
 
-func porn(c *gin.Context) {
+func handlePorn(c *gin.Context) {
 	subreddit, err := client.SRandMember("porn").Result()
 	if err == nil {
 		subreddit = subreddit[1 : len(subreddit)-1]
@@ -52,7 +52,7 @@ func porn(c *gin.Context) {
 	}
 }
 
-func notFound(c *gin.Context) {
+func handleNotFound(c *gin.Context) {
 	statusCode := http.StatusNotFound
 	name := http.StatusText(statusCode)
 	c.JSON(http.StatusNotFound, gin.H{

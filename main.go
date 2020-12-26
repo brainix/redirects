@@ -30,14 +30,17 @@ func initRouter() *gin.Engine {
 	router.StaticFile("/loaderio-caa44a0090b3e2f28909941b0c7b7e9f.txt", "./static/loaderio-caa44a0090b3e2f28909941b0c7b7e9f.txt")
 	api := router.Group("/v1")
 	{
-		api.GET("/health", health)
-		api.HEAD("/health", health)
-		api.GET("/gtfo", gtfo)
-		api.HEAD("/gtfo", gtfo)
-		api.GET("/porn", porn)
-		api.HEAD("/porn", porn)
+		routes := map[string]gin.HandlerFunc{
+			"/health": handleHealth,
+			"/gtfo":   handleGTFO,
+			"/porn":   handlePorn,
+		}
+		for relativePath, handler := range routes {
+			api.GET(relativePath, handler)
+			api.HEAD(relativePath, handler)
+		}
 	}
-	router.NoRoute(notFound)
+	router.NoRoute(handleNotFound)
 	return router
 }
 
