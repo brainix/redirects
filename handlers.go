@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
  |  handlers.go                                                              |
  |                                                                           |
- |  Copyright © 2016-2020, Rajiv Bakulesh Shah, original author.             |
+ |  Copyright © 2020-2021, Rajiv Bakulesh Shah, original author.             |
  |  All rights reserved.                                                     |
 \*---------------------------------------------------------------------------*/
 
