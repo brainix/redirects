@@ -8,6 +8,7 @@
 package main
 
 import (
+	"encoding/json"
 	"log"
 	"net/http"
 
@@ -27,29 +28,31 @@ func handleHealth(c *gin.Context) {
 
 func handleGTFO(c *gin.Context) {
 	url, err := client.SRandMember("gtfo").Result()
-	if err == nil {
-		url = url[1 : len(url)-1]
-		c.Redirect(http.StatusFound, url)
-	} else {
+	if err != nil {
 		log.Println(err)
 		statusCode := http.StatusServiceUnavailable
 		message := http.StatusText(statusCode)
 		c.JSON(statusCode, gin.H{"message": message})
+		return
 	}
+
+	json.Unmarshal([]byte(url), &url)
+	c.Redirect(http.StatusFound, url)
 }
 
 func handlePorn(c *gin.Context) {
 	subreddit, err := client.SRandMember("porn").Result()
-	if err == nil {
-		subreddit = subreddit[1 : len(subreddit)-1]
-		url := "https://www.reddit.com/" + subreddit + "/"
-		c.Redirect(http.StatusFound, url)
-	} else {
+	if err != nil {
 		log.Println(err)
 		statusCode := http.StatusServiceUnavailable
 		message := http.StatusText(statusCode)
 		c.JSON(statusCode, gin.H{"message": message})
+		return
 	}
+
+	json.Unmarshal([]byte(subreddit), &subreddit)
+	url := "https://www.reddit.com/" + subreddit + "/"
+	c.Redirect(http.StatusFound, url)
 }
 
 func handleNotFound(c *gin.Context) {
