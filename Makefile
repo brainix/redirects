@@ -22,6 +22,7 @@ init:
 	brew analytics off
 	brew tap heroku/brew
 	-brew install $(formulae)
+	-go mod init
 
 .PHONY: upgrade
 upgrade:
@@ -31,9 +32,8 @@ upgrade:
 	-brew upgrade $(formulae)
 	brew cleanup
 	-heroku update
-	@# -go mod init
-	@# go get -u -v $(packages)
-	@# go mod tidy
+	go get -t -u -v $(packages)
+	go mod tidy
 
 
 .PHONY: format
