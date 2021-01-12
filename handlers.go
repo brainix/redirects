@@ -11,6 +11,7 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"path"
 )
 
 func handleHealth(w http.ResponseWriter, r *http.Request) {
@@ -26,24 +27,16 @@ func handleHealth(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte(`{"message": "` + message + `"}`))
 }
 
-func makeRedirectHandler(key string) func(w http.ResponseWriter, r *http.Request) {
-	switch key {
-	case "gtfo":
-	case "porn":
-	default:
-		panic(`for makeRedirectHandler(), key must be "gtfo" or "porn"`)
+func redirectHandler(w http.ResponseWriter, r *http.Request) {
+	key := path.Base(r.URL.Path)
+	url, err := client.SRandMember(key).Result()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
-	redirectHandler := func(w http.ResponseWriter, r *http.Request) {
-		url, err := client.SRandMember(key).Result()
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-		json.Unmarshal([]byte(url), &url)
-		if key == "porn" {
-			url = "https://www.reddit.com/" + url + "/"
-		}
-		http.Redirect(w, r, url, http.StatusFound)
+	json.Unmarshal([]byte(url), &url)
+	if key == "porn" {
+		url = "https://www.reddit.com/" + url + "/"
 	}
-	return redirectHandler
+	http.Redirect(w, r, url, http.StatusFound)
 }
