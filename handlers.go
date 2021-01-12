@@ -26,23 +26,24 @@ func handleHealth(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte(`{"message": "` + message + `"}`))
 }
 
-func handleGTFO(w http.ResponseWriter, r *http.Request) {
-	url, err := client.SRandMember("gtfo").Result()
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
+func makeRedirectHandler(key string) func(w http.ResponseWriter, r *http.Request) {
+	switch key {
+	case "gtfo":
+	case "porn":
+	default:
+		panic(`for makeRedirectHandler(), key must be "gtfo" or "porn"`)
 	}
-	json.Unmarshal([]byte(url), &url)
-	http.Redirect(w, r, url, http.StatusFound)
-}
-
-func handlePorn(w http.ResponseWriter, r *http.Request) {
-	subreddit, err := client.SRandMember("porn").Result()
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
+	redirectHandler := func(w http.ResponseWriter, r *http.Request) {
+		url, err := client.SRandMember(key).Result()
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		json.Unmarshal([]byte(url), &url)
+		if key == "porn" {
+			url = "https://www.reddit.com/" + url + "/"
+		}
+		http.Redirect(w, r, url, http.StatusFound)
 	}
-	json.Unmarshal([]byte(subreddit), &subreddit)
-	url := "https://www.reddit.com/" + subreddit + "/"
-	http.Redirect(w, r, url, http.StatusFound)
+	return redirectHandler
 }
