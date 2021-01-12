@@ -11,11 +11,9 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
-
-	"github.com/gin-gonic/gin"
 )
 
-func handleHealth(c *gin.Context) {
+func handleHealth(w http.ResponseWriter, r *http.Request) {
 	statusCode := http.StatusOK
 	_, err := client.Ping().Result()
 	if err != nil {
@@ -23,43 +21,28 @@ func handleHealth(c *gin.Context) {
 		statusCode = http.StatusServiceUnavailable
 	}
 	message := http.StatusText(statusCode)
-	c.JSON(statusCode, gin.H{"message": message})
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(statusCode)
+	w.Write([]byte(`{"message": "` + message + `"}`))
 }
 
-func handleGTFO(c *gin.Context) {
+func handleGTFO(w http.ResponseWriter, r *http.Request) {
 	url, err := client.SRandMember("gtfo").Result()
 	if err != nil {
-		log.Println(err)
-		statusCode := http.StatusServiceUnavailable
-		message := http.StatusText(statusCode)
-		c.JSON(statusCode, gin.H{"message": message})
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-
 	json.Unmarshal([]byte(url), &url)
-	c.Redirect(http.StatusFound, url)
+	http.Redirect(w, r, url, http.StatusFound)
 }
 
-func handlePorn(c *gin.Context) {
+func handlePorn(w http.ResponseWriter, r *http.Request) {
 	subreddit, err := client.SRandMember("porn").Result()
 	if err != nil {
-		log.Println(err)
-		statusCode := http.StatusServiceUnavailable
-		message := http.StatusText(statusCode)
-		c.JSON(statusCode, gin.H{"message": message})
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-
 	json.Unmarshal([]byte(subreddit), &subreddit)
 	url := "https://www.reddit.com/" + subreddit + "/"
-	c.Redirect(http.StatusFound, url)
-}
-
-func handleNotFound(c *gin.Context) {
-	statusCode := http.StatusNotFound
-	name := http.StatusText(statusCode)
-	c.JSON(http.StatusNotFound, gin.H{
-		"status_code": statusCode,
-		"name":        name,
-	})
+	http.Redirect(w, r, url, http.StatusFound)
 }

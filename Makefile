@@ -7,7 +7,7 @@
 
 
 init upgrade: formulae := {go,heroku}
-upgrade: packages := {github.com/gin-gonic/gin,github.com/go-redis/redis}
+upgrade: packages := {github.com/go-redis/redis,}
 
 
 .PHONY: install

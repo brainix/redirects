@@ -9,9 +9,9 @@ package main
 
 import (
 	"log"
+	"net/http"
 	"os"
 
-	"github.com/gin-gonic/gin"
 	"github.com/go-redis/redis"
 )
 
@@ -25,25 +25,6 @@ func getEnvVar(key string) string {
 	return value
 }
 
-func initRouter() *gin.Engine {
-	router := gin.Default()
-	router.StaticFile("/loaderio-caa44a0090b3e2f28909941b0c7b7e9f.txt", "./static/loaderio-caa44a0090b3e2f28909941b0c7b7e9f.txt")
-	api := router.Group("/v1")
-	{
-		routes := map[string]gin.HandlerFunc{
-			"/health": handleHealth,
-			"/gtfo":   handleGTFO,
-			"/porn":   handlePorn,
-		}
-		for relativePath, handler := range routes {
-			api.GET(relativePath, handler)
-			api.HEAD(relativePath, handler)
-		}
-	}
-	router.NoRoute(handleNotFound)
-	return router
-}
-
 func main() {
 	redisURL := getEnvVar("REDIS_URL")
 	opts, err := redis.ParseURL(redisURL)
@@ -51,8 +32,14 @@ func main() {
 		log.Fatal(err)
 	}
 	client = redis.NewClient(opts)
-	router := initRouter()
 
-	port := getEnvVar("PORT")
-	router.Run(":" + port)
+	fileServer := http.FileServer(http.Dir("./static"))
+	http.Handle("/", fileServer)
+	http.HandleFunc("/v1/health", handleHealth)
+	http.HandleFunc("/v1/gtfo", handleGTFO)
+	http.HandleFunc("/v1/porn", handlePorn)
+
+	port := ":" + getEnvVar("PORT")
+	log.Println("Listening and serving HTTP on port " + port)
+	http.ListenAndServe(port, nil)
 }
