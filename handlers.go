@@ -9,7 +9,6 @@ package main
 
 import (
 	"encoding/json"
-	"log"
 	"net/http"
 	"path"
 )
@@ -18,7 +17,6 @@ func handleHealth(w http.ResponseWriter, r *http.Request) {
 	statusCode := http.StatusOK
 	_, err := client.Ping().Result()
 	if err != nil {
-		log.Println(err)
 		statusCode = http.StatusServiceUnavailable
 	}
 	message := http.StatusText(statusCode)
