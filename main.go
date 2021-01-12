@@ -36,8 +36,8 @@ func main() {
 	fileServer := http.FileServer(http.Dir("./static"))
 	http.Handle("/", fileServer)
 	http.HandleFunc("/v1/health", handleHealth)
-	http.HandleFunc("/v1/gtfo", redirectHandler)
-	http.HandleFunc("/v1/porn", redirectHandler)
+	http.HandleFunc("/v1/gtfo", handleRedirect)
+	http.HandleFunc("/v1/porn", handleRedirect)
 
 	port := ":" + getEnvVar("PORT")
 	log.Println("Listening and serving HTTP on port " + port)

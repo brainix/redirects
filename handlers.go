@@ -25,7 +25,7 @@ func handleHealth(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte(`{"message": "` + message + `"}`))
 }
 
-func redirectHandler(w http.ResponseWriter, r *http.Request) {
+func handleRedirect(w http.ResponseWriter, r *http.Request) {
 	key := path.Base(r.URL.Path)
 	url, err := client.SRandMember(key).Result()
 	if err != nil {
