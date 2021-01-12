@@ -41,5 +41,6 @@ func main() {
 
 	port := ":" + getEnvVar("PORT")
 	log.Println("Listening and serving HTTP on port " + port)
-	http.ListenAndServe(port, nil)
+	err = http.ListenAndServe(port, nil)
+	log.Fatal(err)
 }
