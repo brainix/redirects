@@ -13,6 +13,10 @@ import (
 	"path"
 )
 
+type HealthResponse struct {
+	Message string `json:"message"`
+}
+
 func handleHealth(w http.ResponseWriter, r *http.Request) {
 	statusCode := http.StatusOK
 	_, err := client.Ping().Result()
@@ -20,9 +24,15 @@ func handleHealth(w http.ResponseWriter, r *http.Request) {
 		statusCode = http.StatusServiceUnavailable
 	}
 	message := http.StatusText(statusCode)
+	responseStruct := HealthResponse{Message: message}
+	responseBody, err := json.Marshal(responseStruct)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(statusCode)
-	w.Write([]byte(`{"message": "` + message + `"}`))
+	w.Write(responseBody)
 }
 
 func handleRedirect(w http.ResponseWriter, r *http.Request) {
