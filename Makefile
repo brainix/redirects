@@ -34,6 +34,8 @@ upgrade:
 	-heroku update
 	go get -t -u -v $(packages)
 	go mod tidy
+	git status
+	git diff
 
 
 .PHONY: format
